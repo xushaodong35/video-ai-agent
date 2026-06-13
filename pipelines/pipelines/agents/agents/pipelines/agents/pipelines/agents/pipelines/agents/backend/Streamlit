@@ -1,0 +1,36 @@
+import streamlit as st
+import requests
+
+st.set_page_config(page_title="AI Ad Factory", layout="centered")
+
+st.title("🎬 AI广告生成工厂")
+
+st.write("上传一个视频 + 输入产品 → 自动生成广告视频")
+
+video = st.file_uploader("上传视频", type=["mp4", "mov"])
+product = st.text_input("你的产品名称（如：智能台灯）")
+
+if st.button("🚀 生成广告"):
+
+    if video is None or product == "":
+        st.error("请上传视频并填写产品名称")
+    else:
+        with st.spinner("AI正在生成广告中..."):
+
+            files = {"video": video.getvalue()}
+            data = {"product": product}
+
+            try:
+                response = requests.post(
+                    "http://localhost:8000/generate_ad",
+                    files={"video": video},
+                    data=data
+                )
+
+                result = response.json()
+
+                st.success("生成完成！")
+                st.json(result)
+
+            except Exception as e:
+                st.error(f"调用失败: {e}")
